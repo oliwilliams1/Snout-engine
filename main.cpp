@@ -36,13 +36,14 @@ int main(int argc, char** argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_ALPHA);
 
-	int width = 1920;
-	int height = 1080;
+	int width = 800;
+	int height = 600;
 
 	int x = 200;
 	int y = 100;
 	glutInitWindowPosition(x, y);
-	int win = glutCreateWindow("Render Engine");
+	glutInitWindowSize(width, height);
+	int win = glutCreateWindow("Hello World");
 	
 	// must be done after glut init
 	GLenum res = glewInit();
