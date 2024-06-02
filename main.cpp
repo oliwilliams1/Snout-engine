@@ -6,6 +6,7 @@
 using std::string;
 
 GLuint VBO;
+GLint gScalingLocation;
 
 const char* pVSFileName = "shader.vert";
 const char* pFSFileName = "shader.frag";
@@ -77,6 +78,12 @@ static void CompileShaders()
         exit(1);
     }
 
+    gScalingLocation = glGetUniformLocation(ShaderProgram, "gScaling");
+    if (gScalingLocation == -1) {
+        printf("Error getting unifrom location of 'gScaling'\n");
+        exit(1);
+    }
+
     glValidateProgram(ShaderProgram);
     glGetProgramiv(ShaderProgram, GL_VALIDATE_STATUS, &Success);
     if (!Success) {
@@ -88,9 +95,42 @@ static void CompileShaders()
     glUseProgram(ShaderProgram);
 }
 
+static void CombiningTransformations()
+{
+    static float Scale = 0.25f;
+
+    Matrix4f Scaling(Scale, 0.0f, 0.0f, 0.0f,
+                     0.0f, Scale, 0.0f, 0.0f,
+                     0.0f, 0.0f, Scale, 0.0f,
+                     0.0f, 0.0f, 0.0f, 1.0f);
+
+    static float AngleInRadians = 0.0f;
+    static float Delta = 0.01f;
+
+    AngleInRadians += Delta;
+
+    Matrix4f Rotation(cosf(AngleInRadians), -sinf(AngleInRadians), 0.0f, 0.0f,
+                      sinf(AngleInRadians), cosf(AngleInRadians), 0.0f, 0.0f,
+                      0.0f, 0.0f, 1.0f, 0.0f,
+                      0.0f, 0.0f, 0.0f, 1.0f);
+
+    static float Loc = 0.50f;
+
+    Matrix4f Translation(1.0f, 0.0f, 0.0f, Loc,
+						 0.0f, 1.0f, 0.0f, 0.0f,
+						 0.0f, 0.0f, 1.0f, 0.0f,
+						 0.0f, 0.0f, 0.0f, 1.0f);
+
+    Matrix4f FinalTransform = Translation * Rotation * Scaling;
+
+    glUniformMatrix4fv(gScalingLocation, 1, GL_TRUE, FinalTransform);
+}
+
 static void RenderSceneCB()
 {
-	glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    CombiningTransformations();
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
@@ -101,6 +141,8 @@ static void RenderSceneCB()
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 
 	glDisableVertexAttribArray(0);
+
+    glutPostRedisplay();
 
 	glutSwapBuffers();
 }
