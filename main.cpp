@@ -6,7 +6,7 @@
 using std::string;
 
 GLuint VBO;
-GLint gScalingLocation;
+GLint gWorldLocation;
 
 const char* pVSFileName = "shader.vert";
 const char* pFSFileName = "shader.frag";
@@ -78,9 +78,9 @@ static void CompileShaders()
         exit(1);
     }
 
-    gScalingLocation = glGetUniformLocation(ShaderProgram, "gScaling");
-    if (gScalingLocation == -1) {
-        printf("Error getting unifrom location of 'gScaling'\n");
+    gWorldLocation = glGetUniformLocation(ShaderProgram, "gWorld");
+    if (gWorldLocation == -1) {
+        printf("Error getting unifrom location of 'gWorld'\n");
         exit(1);
     }
 
@@ -123,14 +123,33 @@ static void CombiningTransformations()
 
     Matrix4f FinalTransform = Translation * Rotation * Scaling;
 
-    glUniformMatrix4fv(gScalingLocation, 1, GL_TRUE, FinalTransform);
+    glUniformMatrix4fv(gWorldLocation, 1, GL_TRUE, FinalTransform);
+}
+
+static void ScalingExample()
+{
+    static float Scale = 1.0f;
+    static float Delta = 0.001f;
+
+    Scale += Delta;
+    if ((Scale >= 1.5f) || (Scale <= 0.5f)) {
+        Delta *= -1.0f;
+    }
+
+    Matrix4f Scaling(Scale, 0.0f, 0.0f, 0.0f,
+        0.0f, Scale, 0.0f, 0.0f,
+        0.0f, 0.0f, Scale, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f);
+
+    glUniformMatrix4fv(gWorldLocation, 1, GL_TRUE, Scaling);
 }
 
 static void RenderSceneCB()
 {
     glClear(GL_COLOR_BUFFER_BIT);
 
-    CombiningTransformations();
+    ScalingExample();
+    //CombiningTransformations();
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
