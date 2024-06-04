@@ -10,19 +10,18 @@ GLuint VBO;
 GLuint IBO;
 GLuint gWorldLocation;
 
-
 static void RenderSceneCB()
 {
     glClear(GL_COLOR_BUFFER_BIT);
 
-    static float Scale = 0.0f;
+    static float Rotation = 0.0f;
 
-    //    Scale += 0.01f;
+    Rotation += 0.001f;
 
     Matrix4f World;
 
-    World.m[0][0] = cosf(Scale); World.m[0][1] = -sinf(Scale); World.m[0][2] = 0.0f; World.m[0][3] = 0.0f;
-    World.m[1][0] = sinf(Scale); World.m[1][1] = cosf(Scale); World.m[1][2] = 0.0f; World.m[1][3] = 0.0f;
+    World.m[0][0] = cosf(Rotation); World.m[0][1] = -sinf(Rotation); World.m[0][2] = 0.0f; World.m[0][3] = 0.0f;
+    World.m[1][0] = sinf(Rotation); World.m[1][1] = cosf(Rotation); World.m[1][2] = 0.0f; World.m[1][3] = 0.0f;
     World.m[2][0] = 0.0;         World.m[2][1] = 0.0f;         World.m[2][2] = 1.0f; World.m[2][3] = 0.0f;
     World.m[3][0] = 0.0f;        World.m[3][1] = 0.0f;         World.m[3][2] = 0.0f; World.m[3][3] = 1.0f;
 
@@ -211,10 +210,9 @@ int main(int argc, char** argv)
     int x = 200;
     int y = 100;
     glutInitWindowPosition(x, y);
-    int win = glutCreateWindow("Tutorial 10");
+    int win = glutCreateWindow("Render engine");
     printf("window id: %d\n", win);
 
-    // Must be done after glut is initialized!
     GLenum res = glewInit();
     if (res != GLEW_OK) {
         fprintf(stderr, "Error: '%s'\n", glewGetErrorString(res));
