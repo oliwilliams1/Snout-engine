@@ -14,18 +14,33 @@ static void RenderSceneCB()
 {
     glClear(GL_COLOR_BUFFER_BIT);
 
-    static float Rotation = 0.0f;
+    static float RotationScale = 0.0f;
 
-    Rotation += 0.001f;
+    RotationScale += 0.001f;
 
-    Matrix4f World;
+    Matrix4f Rotation(cosf(RotationScale), 0.0f, -sinf(RotationScale), 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        sinf(RotationScale), 0.0f, cosf(RotationScale), 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f);
 
-    World.m[0][0] = cosf(Rotation); World.m[0][1] = -sinf(Rotation); World.m[0][2] = 0.0f; World.m[0][3] = 0.0f;
-    World.m[1][0] = sinf(Rotation); World.m[1][1] = cosf(Rotation); World.m[1][2] = 0.0f; World.m[1][3] = 0.0f;
-    World.m[2][0] = 0.0;         World.m[2][1] = 0.0f;         World.m[2][2] = 1.0f; World.m[2][3] = 0.0f;
-    World.m[3][0] = 0.0f;        World.m[3][1] = 0.0f;         World.m[3][2] = 0.0f; World.m[3][3] = 1.0f;
+    Matrix4f Translation(1.0f, 0.0f, 0.0f, 0.0f,
+                         0.0f, 1.0f, 0.0f, 0.0f,
+                         0.0f, 0.0f, 1.0f, 2.0f,
+                         0.0f, 0.0f, 0.0f, 1.0f);
 
-    glUniformMatrix4fv(gWorldLocation, 1, GL_TRUE, &World.m[0][0]);
+    float FOV = 90.0f;
+    float tanHalfFOV = tanf(ToRadian(FOV / 2.0f));
+    float f = 1.0f/tanHalfFOV;
+
+    Matrix4f Projection(f, 0.0f, 0.0f, 0.0f,
+        0.0f, f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f);
+
+    Matrix4f FinalMatrix = Projection * Translation * Rotation;
+
+
+    glUniformMatrix4fv(gWorldLocation, 1, GL_TRUE, &FinalMatrix.m[0][0]);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
