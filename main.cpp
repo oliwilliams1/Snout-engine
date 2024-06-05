@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <string.h>
-#include <math.h>
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
@@ -8,7 +7,7 @@
 
 GLuint VBO;
 GLuint IBO;
-GLuint gWorldLocation;
+GLuint gWVPLocation;
 
 const int WIDTH = 800;
 const int HEIGHT = 600;
@@ -31,10 +30,21 @@ static void RenderSceneCB()
                          0.0f, 0.0f, 1.0f, 2.0f,
                          0.0f, 0.0f, 0.0f, 1.0f);
 
+    Matrix4f World = Translation * Rotation;
+
+    Vector3f CameraPos(0.0f, 0.0f, 0.0f);
+    Vector3f U(1.0, 0.0f, 0.0f);
+    Vector3f V(0.0f, 1.0f, 0.0f);
+    Vector3f N(0.0f, 0.0f, 1.0f);
+
+    Matrix4f Camera(U.x, U.y, U.z, -CameraPos.x,
+        V.x, V.y, V.z, -CameraPos.y,
+        N.x, N.y, N.z, -CameraPos.z,
+        0.0f, 0.0f, 0.0f, 1.0f);
+
     float FOV = 90.0f;
     float tanHalfFOV = tanf(ToRadian(FOV / 2.0f));
     float f = 1.0f/tanHalfFOV;
-
     float aspect_ratio = (float)WIDTH / (float)HEIGHT;
 
     float zNear = 1.0f;
@@ -50,10 +60,10 @@ static void RenderSceneCB()
         0.0f, 0.0f, A, B,
         0.0f, 0.0f, 1.0f, 0.0f);
 
-    Matrix4f FinalMatrix = Projection * Translation * Rotation;
+    Matrix4f WVP = Projection * Camera * World;
 
 
-    glUniformMatrix4fv(gWorldLocation, 1, GL_TRUE, &FinalMatrix.m[0][0]);
+    glUniformMatrix4fv(gWVPLocation, 1, GL_TRUE, &WVP.m[0][0]);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
@@ -204,9 +214,9 @@ static void CompileShaders()
         exit(1);
     }
 
-    gWorldLocation = glGetUniformLocation(ShaderProgram, "gWorld");
-    if (gWorldLocation == -1) {
-        printf("Error getting uniform location of 'gWorld'\n");
+    gWVPLocation = glGetUniformLocation(ShaderProgram, "gWVP");
+    if (gWVPLocation == -1) {
+        printf("Error getting uniform location of 'gWVP'\n");
         exit(1);
     }
 

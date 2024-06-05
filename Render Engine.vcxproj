@@ -130,12 +130,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Common\camera.cpp" />
+    <ClCompile Include="Common\math_3d.cpp" />
     <ClCompile Include="Common\ogldev_util.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Common\world_transform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shader.frag" />
     <None Include="shader.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Include\camera.h" />
+    <ClInclude Include="Include\world_transform.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

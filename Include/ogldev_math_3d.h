@@ -15,6 +15,9 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif // idk why this works above the other code but hey it works
 
 #ifndef MATH_3D_H
 #define MATH_3D_H
