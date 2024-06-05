@@ -10,6 +10,9 @@ GLuint VBO;
 GLuint IBO;
 GLuint gWorldLocation;
 
+const int WIDTH = 800;
+const int HEIGHT = 600;
+
 static void RenderSceneCB()
 {
     glClear(GL_COLOR_BUFFER_BIT);
@@ -32,9 +35,19 @@ static void RenderSceneCB()
     float tanHalfFOV = tanf(ToRadian(FOV / 2.0f));
     float f = 1.0f/tanHalfFOV;
 
-    Matrix4f Projection(f, 0.0f, 0.0f, 0.0f,
+    float aspect_ratio = (float)WIDTH / (float)HEIGHT;
+
+    float zNear = 1.0f;
+    float zFar = 10.0f;
+
+    float zRange = zFar - zNear;
+
+    float A = (-zFar - zNear) / zRange;      // tells OpenGL to scale the z (depth) values from -1 to 1
+    float B = 2.0f * zFar * zNear / zRange;  //
+
+    Matrix4f Projection(f/aspect_ratio, 0.0f, 0.0f, 0.0f,
         0.0f, f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, A, B,
         0.0f, 0.0f, 1.0f, 0.0f);
 
     Matrix4f FinalMatrix = Projection * Translation * Rotation;
@@ -218,9 +231,7 @@ int main(int argc, char** argv)
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
-    int width = 500;
-    int height = 500;
-    glutInitWindowSize(width, height);
+    glutInitWindowSize(WIDTH, HEIGHT);
 
     int x = 200;
     int y = 100;
